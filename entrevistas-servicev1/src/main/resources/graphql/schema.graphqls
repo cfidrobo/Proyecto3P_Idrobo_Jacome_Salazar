@@ -1,0 +1,84 @@
+type Query {
+    entrevistas: [Entrevista!]!
+    entrevista(id: ID!): Entrevista
+    entrevistasPorTipo(tipo: TipoEntrevista!): [Entrevista!]!
+    reporteEntrevistas(tipo: TipoEntrevista!): ReporteEntrevista!
+}
+
+type Mutation {
+    agendarEntrevista(input: EntrevistaInput!): Entrevista!
+    registrarCalificacion(input: CalificacionInput!): Entrevista!
+    actualizarEstadoDecision(input: DecisionInput!): Entrevista!
+}
+
+type Entrevista {
+    id: ID!
+    candidatoId: ID!
+    vacanteId: ID!
+    fechaEntrevista: String!
+    entrevistador: String!
+    tipo: TipoEntrevista!
+    estado: String!
+    calificacion: Float
+    aprobada: Boolean
+    estadoDecision: EstadoDecision!
+    comentarios: String
+    fechaDecision: String
+    comentariosDecision: String
+    areaAprobadora: String
+}
+
+type ReporteEntrevista {
+    tipo: TipoEntrevista!
+    totalEntrevistas: Int!
+    promedioCalificacion: Float!
+    entrevistasAprobadas: Int!
+    entrevistasRechazadas: Int!
+    tasaAprobacion: Float!
+    tiempoPromedioDecision: String!
+}
+
+input EntrevistaInput {
+    candidatoId: ID!
+    vacanteId: ID!
+    fechaEntrevista: String!
+    entrevistador: String!
+    tipo: TipoEntrevista!
+    comentarios: String
+}
+
+input CalificacionInput {
+    entrevistaId: ID!
+    calificacion: Float!
+    aprobada: Boolean!
+    comentarios: String
+}
+
+input DecisionInput {
+    entrevistaId: ID!
+    estadoDecision: EstadoDecision!
+    comentarios: String
+    areaAprobadora: String
+}
+
+enum TipoEntrevista {
+    PSICOLOGICA
+    TECNICA
+    DIRECTOR_RRHH
+}
+
+enum EstadoDecision {
+    PENDIENTE_DECISION
+    SELECCIONADO
+    RECHAZADO
+    ACEPTADO_POR_CANDIDATO
+    RECHAZADO_POR_CANDIDATO
+}
+type Evaluacion {
+  id: ID!
+  candidatoId: ID!
+  entrevistaId: ID! 
+  puntaje: Float!
+  observaciones: String
+  fecha: String!
+}

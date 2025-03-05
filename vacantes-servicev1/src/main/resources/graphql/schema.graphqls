@@ -1,0 +1,56 @@
+enum EstadoVacante {
+    BORRADOR
+    PENDIENTE_APROBACION
+    PUBLICADA
+    CERRADA
+}
+
+enum TipoReclutamiento {
+    INTERNO
+    EXTERNO
+    AMBOS
+}
+
+type Requisicion {
+    id: ID!
+    cargo: String!
+    descripcion: String!
+    categoriaSalarial: String!
+    perfil: String!
+    fechaCreacion: String!
+    fechaLimiteConvocatoria: String!
+    estado: EstadoVacante!
+    tipoReclutamiento: TipoReclutamiento!
+    aprobadoPorRRHH: Boolean!
+}
+
+type Query {
+    getRequisiciones: [Requisicion]!
+    getRequisicionById(id: ID!): Requisicion
+    getRequisicionesPorEstado(estado: EstadoVacante!): [Requisicion]!
+}
+
+type Mutation {
+    createRequisicion(
+        cargo: String!
+        descripcion: String!
+        categoriaSalarial: String!
+        perfil: String!
+        fechaLimiteConvocatoria: String!
+        tipoReclutamiento: TipoReclutamiento!
+    ): Requisicion!
+    
+    aprobarRequisicion(id: ID!): Requisicion!
+    enviarParaAprobacion(id: ID!): Requisicion!
+    cerrarVacante(id: ID!): Requisicion!
+    deleteRequisicion(id: ID!): Boolean
+    updateRequisicion(
+        id: ID!
+        cargo: String
+        descripcion: String
+        categoriaSalarial: String
+        perfil: String
+        fechaLimiteConvocatoria: String
+        tipoReclutamiento: TipoReclutamiento
+    ): Requisicion!
+}

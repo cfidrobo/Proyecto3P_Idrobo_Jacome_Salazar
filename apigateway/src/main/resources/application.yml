@@ -1,0 +1,65 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: API-GATEWAY
+  security:
+    user:
+      name: admin
+      password: admin123
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: candidatos-graphql
+          uri: lb://CANDIDATOS-SERVICE
+          predicates:
+            - Path=/candidatos/graphql, /candidatos/graphiql
+          filters:
+            - RewritePath=/candidatos/(?<segment>.*), /$\{segment}
+        - id: entrevistas-graphql
+          uri: lb://ENTREVISTAS-SERVICE
+          predicates:
+            - Path=/entrevistas/graphql, /entrevistas/graphiql
+          filters:
+            - RewritePath=/entrevistas/(?<segment>.*), /$\{segment}
+        - id: vacantes-graphql
+          uri: lb://VACANTES-SERVICE
+          predicates:
+            - Path=/vacantes/graphql, /vacantes/graphiql
+          filters:
+            - RewritePath=/vacantes/(?<segment>.*), /$\{segment}
+  main:
+    web-application-type: reactive
+    allow-bean-definition-overriding: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

@@ -1,0 +1,164 @@
+type Candidato {
+    id: ID!
+    nombre: String!
+    correo: String!
+    telefono: String!
+    experiencia: String!
+    habilidades: String!
+    tipo: TipoCandidato!
+    estado: EstadoCandidato!
+    puntajePsicotecnico: Float
+    puntajeTecnico: Float
+    puntajeEntrevista: Float
+    puntajeTotal: Float
+    fechaPostulacion: String!
+    fechaUltimaEvaluacion: String
+    observaciones: String
+    vacanteId: ID
+}
+
+input CandidatoInput {
+    nombre: String!
+    correo: String!
+    telefono: String!
+    experiencia: String!
+    habilidades: String!
+    tipo: TipoCandidato!
+    vacanteId: ID
+    observaciones: String
+}
+
+input EvaluacionInput {
+    candidatoId: ID!
+    puntaje: Float!
+    observaciones: String
+}
+
+input PostulacionInput {
+    candidatoId: ID!
+    vacanteId: ID!
+    comentarios: String
+}
+
+type EstadisticasCandidatos {
+    totalCandidatos: Int!
+    candidatosPorEstado: [EstadisticaEstado!]!
+    promedioEvaluaciones: PromedioEvaluaciones!
+    distribucionTipo: [DistribucionTipo!]!
+}
+
+type EstadisticaEstado {
+    estado: EstadoCandidato!
+    cantidad: Int!
+    porcentaje: Float!
+}
+
+type PromedioEvaluaciones {
+    promedioPsicotecnico: Float!
+    promedioTecnico: Float!
+    promedioEntrevista: Float!
+    promedioTotal: Float!
+}
+
+type DistribucionTipo {
+    tipo: TipoCandidato!
+    cantidad: Int!
+    porcentaje: Float!
+}
+
+type HabilidadEstadistica {
+    habilidad: String!
+    cantidad: Int!
+    porcentajeCandidatos: Float!
+}
+
+enum TipoCandidato {
+    INTERNO
+    EXTERNO
+}
+
+enum EstadoCandidato {
+    POSTULADO
+    EN_EVALUACION_PSICOTECNICA
+    EN_EVALUACION_TECNICA
+    FINALISTA
+    SELECCIONADO
+    RECHAZADO
+}
+
+type Seleccion {
+    id: ID!
+    candidatoId: ID!
+    requisicionId: ID!
+    fecha: String!
+    estado: String!
+    comentarios: String
+}
+
+input SeleccionInput {
+    candidatoId: ID!
+    requisicionId: ID!
+    fecha: String!
+    estado: String!
+    comentarios: String
+}
+
+type Query {
+    # Consultas básicas
+    candidatos: [Candidato]!
+    candidato(id: ID!): Candidato
+    candidatosPorEstado(estado: EstadoCandidato!): [Candidato]!
+    candidatosPorTipo(tipo: TipoCandidato!): [Candidato]!
+
+    # Consultas de reportes
+    estadisticasCandidatos: EstadisticasCandidatos!
+    candidatosFinalistasRecientes(dias: Int!): [Candidato]!
+    estadisticasHabilidades: [HabilidadEstadistica!]!
+    candidatosPorVacante(vacanteId: ID!): [Candidato]!
+    
+    # Consultas de rendimiento
+    mejoresCandidatos(limite: Int!): [Candidato]!
+    candidatosEnProceso: [Candidato]!
+
+    # Consultas de selección
+    getSelecciones: [Seleccion]!
+    getSeleccion(id: ID!): Seleccion
+}
+
+type VacanteInfo {
+    id: ID!
+    cargo: String!
+    descripcion: String!
+    categoriaSalarial: String!
+    fechaLimiteConvocatoria: String!
+    tipoReclutamiento: String!
+    estado: String!
+}
+
+type Mutation {
+    # Gestión básica
+    createCandidato(candidato: CandidatoInput!): Candidato!
+    
+    # Evaluaciones
+    registrarEvaluacionPsicotecnica(evaluacion: EvaluacionInput!): Candidato!
+    registrarEvaluacionTecnica(evaluacion: EvaluacionInput!): Candidato!
+    registrarEntrevista(evaluacion: EvaluacionInput!): Candidato!
+    
+    # Decisiones
+    seleccionarCandidato(id: ID!): Candidato!
+    rechazarCandidato(id: ID!, motivo: String!): Candidato!
+    
+    # Integración con vacantes
+    postularAVacante(postulacion: PostulacionInput!): Seleccion!
+    actualizarEstadoPostulacion(
+        id: ID!, 
+        estado: EstadoCandidato!, 
+        observaciones: String
+    ): Candidato!
+    actualizarCandidato(id: ID!, input: CandidatoInput!): Candidato!
+    eliminarCandidato(id: ID!): Boolean!
+
+    # Selección
+    createSeleccion(input: SeleccionInput!): Seleccion!
+    updateSeleccion(id: ID!, input: SeleccionInput!): Seleccion!
+}
